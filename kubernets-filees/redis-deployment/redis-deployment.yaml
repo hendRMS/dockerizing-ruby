@@ -1,0 +1,47 @@
+# Redis Service 
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: rails-app
+  labels:
+    app: redis
+spec:
+  type: ClusterIP
+  ports:
+   - targetPort: 6379
+     port: 6379
+  selector:
+   app: redis
+--- 
+# Run a Single-Instance Stateful Application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: rails-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - mountPath: /var/lib/redis/data
+              name: redisdb
+      volumes:
+        - name: redisdb
+          persistentVolumeClaim:
+            claimName: redis-pv-claim

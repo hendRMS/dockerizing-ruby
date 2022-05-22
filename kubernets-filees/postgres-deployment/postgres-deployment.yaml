@@ -1,0 +1,50 @@
+# Postgresql Service 
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: rails-app
+  labels:
+    app: postgres
+spec:
+  type: ClusterIP
+  ports:
+   - targetPort: 5432
+     port: 5432
+  selector:
+   app: postgres
+---
+# Run a Single-Instance Stateful Application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: rails-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14.2
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: postgres-secrets
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim

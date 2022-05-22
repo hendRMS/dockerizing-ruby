@@ -1,0 +1,49 @@
+# App SVC
+apiVersion: v1
+kind: Service
+metadata:
+  name: drkiq-svc
+  namespace: rails-app
+  labels:
+    app: drkiq-svc
+spec:
+  type: NodePort
+  ports:
+   - targetPort: 8010
+     port: 8010
+  selector:
+   app: drkiq
+   
+---
+# APP Deployment 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drkiq
+  namespace: rails-app
+  labels:
+    app: drkiq
+spec:
+  template:
+    metadata:
+      name: drkiq
+      labels:
+        app: drkiq
+    spec:
+      containers:
+        - name: drkiq-container
+          image: hend91/rails-app:v1
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: app-config
+          resources:
+            requests:
+              cpu: 100m
+            limits:
+              cpu: 200m
+
+  replicas: 3
+  selector:
+    matchLabels:
+      app: drkiq

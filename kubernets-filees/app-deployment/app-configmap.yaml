@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: rails-app
+  labels:
+    app: app-config
+data:
+  POSTGRES_DB: postgresdb
+  SECRET_TOKEN: Wa4Kdu6hMt3tYKm4jb9p4vZUuc7jBVFw
+  WORKER_PROCESSES: "1"
+  DATABASE_URL: "postgresql://drkiq:test_db_password@postgres:5432/drkiq?encoding=utf8&pool=5&timeout=5000"
+  LISTEN_ON: "0.0.0.0:8010"
+  CACHE_URL: "redis://redis:6379/0"
+  JOB_WORKER_URL: "redis://redis:6379/0"

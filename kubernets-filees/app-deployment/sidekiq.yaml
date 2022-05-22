@@ -1,0 +1,29 @@
+# Sidekiq Deployment 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sidekiq
+  namespace: rails-app
+  labels:
+    app: sidekiq
+spec:
+  template:
+    metadata:
+      name: sidekiq
+      labels:
+        app: sidekiq
+    spec:
+      containers:
+        - name: sidekiq-container
+          image: hend91/rails-app:v1
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: app-config
+          command: ["/bin/sh"]
+          args: ["-c", "bundle exec sidekiq"]
+
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sidekiq

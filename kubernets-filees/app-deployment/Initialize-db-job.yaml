@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: drkiq-migration
+  namespace: rails-app
+  labels:
+    app: drkiq-migration
+spec:
+  template:
+    metadata:
+      labels:
+        app: drkiq-migration
+    spec:
+      containers:
+      - command: ["/bin/sh"]
+        args: ["-c", "rake db:reset && rake db:migrate"]
+        envFrom:
+        - configMapRef:
+            name: app-config
+        image: hend91/rails-app:v1
+        imagePullPolicy: IfNotPresent
+        name: drkiq-migration-container
+      restartPolicy: Never
